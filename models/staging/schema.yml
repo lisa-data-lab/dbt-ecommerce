@@ -1,0 +1,207 @@
+version: 2
+
+sources:
+  # Source 1: Customer dimension
+  - name: silver_customers
+    database: silver_dev
+    schema: customers
+    tables:
+      - name: dim_customer
+
+  # Source 2: Orders fact tables
+  - name: silver_orders
+    database: silver_dev
+    schema: orders
+    tables:
+      - name: fact_orders
+      - name: fact_order_items
+      - name: invoice_customer_bridge
+
+
+  - name: silver_campaigns
+    database: silver_dev
+    schema: marketing
+    tables:
+      - name: dim_campaign
+      - name: marketing_spend
+      - name: event_triggers
+
+      # Events
+  - name: silver_events
+    database: silver_dev
+    schema: events    # replace with actual schema where journey_events and event_triggers reside
+    tables:
+      - name: journey_events
+
+  - name: silver_products
+    database: silver_dev
+    schema: products
+    tables:
+      - name: dim_product
+
+  - name: silver_dates
+    database: silver_dev
+    schema: shared
+    tables:
+      - name: dim_date
+
+models:
+  - name: stg_customers
+    description: "Cleaned and standardized customer data"
+    columns:
+      - name: customer_id
+        description: "Unique customer identifier"
+        tests:
+          - not_null
+          - unique
+      - name: first_name
+        description: "First name, trimmed"
+      - name: last_name
+        description: "Last name, trimmed"
+      - name: email_hash
+        description: "Hashed email"
+
+  - name: stg_orders
+    description: "Cleaned orders data"
+    columns:
+      - name: order_id
+        description: "Unique order identifier"
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Customer who placed the order"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+  - name: stg_order_items
+    description: "Cleaned order items staging table"
+    columns:
+      - name: order_id
+        description: "Unique order identifier"
+        tests:
+          - not_null
+      - name: product_id
+        description: "Product identifier"
+        tests:
+          - not_null
+      - name: quantity
+        description: "Quantity ordered"
+      - name: unit_price
+        description: "Price per unit"
+      - name: line_total
+        description: "Total amount for this item"
+
+# Campaigns
+  - name: stg_dim_campaign
+    description: "Cleaned campaign dimension"
+    columns:
+      - name: campaign_id
+        description: "Unique campaign identifier"
+        tests:
+          - not_null
+          - unique
+      - name: channel
+      - name: start_dt
+      - name: end_dt
+      - name: objective
+      - name: budget
+
+       # Marketing Spend
+  - name: stg_marketing_spend
+    description: "Daily marketing spend metrics"
+    columns:
+      - name: campaign_id
+        description: "Campaign identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_dim_campaign')
+              field: campaign_id
+      - name: day
+        description: "Date of spend"
+      - name: impressions
+      - name: clicks
+      - name: spend
+
+      # Journey Events
+  - name: stg_journey_events
+    description: "Customer journey events"
+    columns:
+      - name: event_id
+        description: "Unique event identifier"
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Customer who triggered the event"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: campaign_id
+        tests:
+          - relationships:
+              to: ref('stg_dim_campaign')
+              field: campaign_id
+      - name: event_type
+      - name: ts
+
+       # Event Triggers
+  - name: stg_event_triggers
+    description: "Customer event triggers"
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: trigger_type
+      - name: reason
+      - name: valid_from
+      - name: valid_to
+      - name: status
+      - name: policy_version
+
+        # Products
+  - name: stg_product_dim
+    description: "Product dimension"
+    columns:
+      - name: stock_code
+        description: "Unique product identifier"
+        tests:
+          - not_null
+          - unique
+      - name: description
+      - name: avg_unit_price
+      - name: first_seen
+      - name: last_seen
+      - name: total_qty
+
+      # Dates
+  - name: stg_dim_date
+    description: "Date dimension"
+    columns:
+      - name: date_key
+        description: "Unique date key"
+        tests:
+          - not_null
+          - unique
+      - name: year
+      - name: quarter
+      - name: month
+      - name: day
+      - name: day_of_week
+      - name: week_of_year
+      - name: month_name
+      - name: day_name
+
+
+
+
+
