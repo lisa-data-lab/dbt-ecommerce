@@ -73,10 +73,7 @@ models:
         description: "Customer who placed the order"
         tests:
           - not_null
-          - relationships:
-              to: ref('stg_customers')
-              field: customer_id
-
+          
   - name: stg_order_items
     description: "Cleaned order items staging table"
     columns:

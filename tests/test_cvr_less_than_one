@@ -1,0 +1,6 @@
+SELECT
+    date,
+    CVR
+FROM {{ ref('mart_daily_kpis') }}
+-- Fail if CVR is greater than 1.0 (100%)
+WHERE CVR > 1.0

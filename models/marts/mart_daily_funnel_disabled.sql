@@ -3,6 +3,7 @@
     config(
         materialized='table',
         table_name='mart_daily_funnels',
+        enabled=false,
         description='Daily funnel snapshot by campaign and stage.'
     )
 }}

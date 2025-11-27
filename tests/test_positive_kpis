@@ -1,0 +1,23 @@
+-- tests/test_positive_kpis.sql
+
+SELECT
+    date,
+    DAU,
+    WAU,
+    MAU,
+    Total_Orders,
+    Total_Revenue,
+    Total_Spend,
+    Total_Impressions
+
+FROM {{ ref('mart_daily_kpis') }}
+
+-- Fail if any core metric is less than zero
+WHERE
+    DAU < 0
+    OR WAU < 0
+    OR MAU < 0
+    OR Total_Orders < 0
+    OR Total_Revenue < 0
+    OR Total_Spend < 0
+    OR Total_Impressions < 0

@@ -14,353 +14,387 @@ models:
         description: "Daily Active Users."
         tests:
           - not_null
-          - expression_is_true:
-              expression: "DAU >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: WAU
         description: "Weekly Active Users (7-day rolling)."
         tests:
           - not_null
-          - expression_is_true:
-              expression: "WAU >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= DAU"
       - name: MAU
         description: "Monthly Active Users (30-day rolling)."
         tests:
           - not_null
-          - expression_is_true:
-              expression: "MAU >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: " >= WAU"
       - name: Total_Orders
         description: "Total number of orders on this date."
         tests:
           - not_null
-          - expression_is_true:
-              expression: "Total_Orders >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: Total_Conversions
         description: "Total number of unique customers who converted on this date."
         tests:
-          - expression_is_true:
-              expression: "Total_Conversions >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: Total_Revenue
         description: "Total revenue from orders on this date."
         tests:
           - not_null
-          - expression_is_true:
-              expression: "Total_Revenue >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: Total_Spend
         description: "Total marketing spend on this date."
         tests:
-          - expression_is_true:
-              expression: "Total_Spend >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: Total_Impressions
         description: "Total ad impressions on this date."
         tests:
-          - expression_is_true:
-              expression: "Total_Impressions >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: CVR
         description: "Conversion rate = Total_Conversions / DAU."
         tests:
-          - expression_is_true:
-              expression: "CVR >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: AOV
         description: "Average Order Value = Total_Revenue / Total_Orders."
         tests:
-          - expression_is_true:
-              expression: "AOV >= 0"
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: ROAS
         description: "Return on Ad Spend = Total_Revenue / Total_Spend."
         tests:
-          - expression_is_true:
-              expression: "ROAS >= 0"
-    tests:
-      - mart_daily_kpis_quality
-
-models:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+    
   - name: mart_funnels
     description: "Campaign-level aggregated funnel metrics, including awareness, consideration, and conversion stages with conversion rates and timing metrics."
     columns:
+    - name: campaign_id
+      description: "Campaign identifier."
+      tests:
+        - not_null
+        - unique
+    - name: channel
+      description: "Campaign channel (e.g., paid_search, affiliate, email)."
+      tests:
+        - not_null
+    - name: objective
+      description: "Campaign objective (acquisition, retention, winback)."
+    - name: start_dt
+      description: "Campaign start date."
+      tests:
+        - not_null
+    - name: end_dt
+      description: "Campaign end date."
+    - name: budget
+      description: "Campaign budget."
+    - name: awareness_users
+      description: "Number of customers who reached awareness stage."
+      tests:
+        - not_null
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= 0"
+    - name: consideration_users
+      description: "Number of customers who reached consideration stage."
+      tests:
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= 0"
+    - name: conversion_users
+      description: "Number of customers who converted."
+      tests:
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= 0"
+    - name: rate_awareness_to_consideration
+      description: "Conversion rate from awareness to consideration stage."
+      tests:
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= 0"
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: "<= 1.0"
+    - name: rate_consideration_to_conversion
+      description: "Conversion rate from consideration to conversion stage."
+      tests:
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= 0"
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: "<= 1.0"
+    - name: rate_overall_conversion
+      description: "Overall conversion rate from awareness to conversion."
+      tests:
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= 0"
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: "<= 1.0"
+    - name: avg_days_to_convert
+      description: "Average number of days from first awareness to conversion."
+      tests:
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= 0"
+    - name: median_days_to_convert
+      description: "Median number of days from first awareness to conversion."
+      tests:
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= 0"
+ 
+  - name: mart_campaign_performance
+    description: "Comprehensive campaign performance summary including funnel, cohort, conversion, and ROI metrics."
+    columns:
       - name: campaign_id
-        description: "Campaign identifier."
+        description: "Unique campaign identifier."
         tests:
-          - not_null
           - unique
+          - not_null
       - name: channel
-        description: "Campaign channel (e.g., paid_search, affiliate, email)."
+        description: "Primary marketing channel for the campaign."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['paid_social','email','paid_search','affiliate']                
+      - name: objective
+        description: "Campaign objective (e.g., awareness, conversion)."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['winback','retention','acquisition']
+      - name: budget
+        description: "Budget allocated for the campaign."
         tests:
           - not_null
-      - name: objective
-        description: "Campaign objective (acquisition, retention, winback)."
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
       - name: start_dt
         description: "Campaign start date."
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: date
       - name: end_dt
         description: "Campaign end date."
-      - name: budget
-        description: "Campaign budget."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: date
+          - dbt_utils.expression_is_true:
+              expression: ">= start_dt"
       - name: awareness_users
-        description: "Number of customers who reached awareness stage."
+        description: "Number of users reached at the awareness stage."
         tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
           - not_null
-          - expression_is_true:
-              expression: "awareness_users >= 0"
       - name: consideration_users
-        description: "Number of customers who reached consideration stage."
+        description: "Number of users reached at the consideration stage."
         tests:
-          - expression_is_true:
-              expression: "consideration_users >= 0"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
       - name: conversion_users
-        description: "Number of customers who converted."
+        description: "Number of users reached at the conversion stage."
         tests:
-          - expression_is_true:
-              expression: "conversion_users >= 0"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+          # Ensure funnel consistency: conversion users <= consideration users
+          - dbt_utils.expression_is_true:
+              expression: "<= consideration_users"
+
+      # --- Rate Metrics (Ratios) ---
       - name: rate_awareness_to_consideration
         description: "Conversion rate from awareness to consideration stage."
         tests:
-          - expression_is_true:
-              expression: "rate_awareness_to_consideration >= 0"
+          # Ratios must be between 0 and 1 (0% to 100%)
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+              max_value: 1.0
       - name: rate_consideration_to_conversion
         description: "Conversion rate from consideration to conversion stage."
         tests:
-          - expression_is_true:
-              expression: "rate_consideration_to_conversion >= 0"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+              max_value: 1.0
       - name: rate_overall_conversion
-        description: "Overall conversion rate from awareness to conversion."
+        description: "Overall conversion rate from awareness to conversion stage."
         tests:
-          - expression_is_true:
-              expression: "rate_overall_conversion >= 0"
-      - name: avg_days_to_convert
-        description: "Average number of days from first awareness to conversion."
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+              max_value: 1.0
+      
+      # --- Financial/Metric Columns (Adding not_null where appropriate) ---
+      - name: total_engagements
+        description: "Total engagement events recorded for the campaign."
         tests:
-          - expression_is_true:
-              expression: "avg_days_to_convert >= 0"
-      - name: median_days_to_convert
-        description: "Median number of days from first awareness to conversion."
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+          - not_null
+      - name: total_conversions
+        description: "Total conversions from engagements."
         tests:
-          - expression_is_true:
-              expression: "median_days_to_convert >= 0"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+          - not_null
+      - name: total_revenue
+        description: "Total revenue generated by the campaign."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+      - name: total_spend
+        description: "Total spend allocated or used for the campaign."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+      - name: cvr
+        description: "Conversion rate based on engagement events."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+              max_value: 1.0
+          - not_null
+      - name: aov
+        description: "Average order value (total_revenue / total_orders)."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+          - not_null
+      - name: roas
+        description: "Return on ad spend (total_revenue / total_spend)."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+          - not_null
+      - name: cac
+        description: "Customer acquisition cost (total_spend / total_conversions)."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+          - not_null
 
-models:
-  - name: mart_funnel_customers
-    description: "Customer-level funnel metrics for each campaign, tracking stages from awareness to conversion."
-    columns:
-      - name: customer_id
-        description: "Customer identifier."
-        tests:
-          - not_null
-      - name: campaign_id
-        description: "Campaign identifier."
-        tests:
-          - not_null
-      - name: channel
-        description: "Campaign channel (e.g., paid_search, email, affiliate)."
-        tests:
-          - not_null
-      - name: first_awareness_ts
-        description: "Timestamp of the first awareness stage reached by the customer."
-      - name: first_consideration_ts
-        description: "Timestamp of the first consideration stage reached by the customer."
-      - name: first_conversion_ts
-        description: "Timestamp of the first conversion achieved by the customer."
-      - name: funnel_stage
-        description: "Highest funnel stage reached by the customer (awareness, consideration, conversion, none)."
-        tests:
-          - not_null
-      - name: is_converted
-        description: "Boolean flag indicating if the customer converted in the campaign."
-      - name: days_to_convert
-        description: "Number of days from first awareness to first conversion. Null if customer did not convert."
-        tests:
-          - expression_is_true:
-              expression: "days_to_convert >= 0 OR days_to_convert IS NULL"
-    tests: 
-      - test_mart_funnels_consistency
-
-models:
-  - name: mart_daily_funnels
-    description: "Daily snapshot of the funnel by campaign and stage, including daily and cumulative users, and daily conversion rates."
-    columns:
-      - name: campaign_id
-        description: "Campaign identifier."
-        tests:
-          - not_null
-      - name: channel
-        description: "Campaign channel (e.g., paid_search, email, affiliate)."
-        tests:
-          - not_null
-      - name: funnel_stage
-        description: "Funnel stage (awareness, consideration, conversion)."
-        tests:
-          - not_null
-      - name: date
-        description: "Date of the snapshot."
-        tests:
-          - not_null
-      - name: daily_users
-        description: "Number of users reaching the funnel stage on this day."
-        tests:
-          - expression_is_true:
-              expression: "daily_users >= 0"
-      - name: cumulative_users
-        description: "Cumulative number of users who have reached this stage up to this day."
-        tests:
-          - expression_is_true:
-              expression: "cumulative_users >= 0"
-      - name: daily_conversion_rate
-        description: "Daily conversion rate relative to the previous funnel stage. Null if previous stage has zero users."
-        tests:
-          - expression_is_true:
-              expression: "daily_conversion_rate >= 0 OR daily_conversion_rate IS NULL"
-
-models:
-
-- name: mart_campaign_performance
-  description: "Comprehensive campaign performance summary including funnel, cohort, conversion, and ROI metrics."
-  columns:
-
-  - name: campaign_id
-    description: "Unique campaign identifier."
+  - name: mart_customer_360
+    description: "360° view of each customer including demographic, purchase, marketing, funnel, product, revenue, value segmentation, and derived metrics (LTV and average days between orders)."
     tests:
+        - dbt_utils.expression_is_true:
+              expression: "avg_days_between_orders >= 0 OR avg_days_between_orders IS NULL"
+          # Sanity check: If total_orders > 0, total_spent should be > 0 (or vice versa)
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: "(total_orders > 0) = (total_spent > 0)"
+        # Time duration cannot be negative for converted customers
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: "days_to_convert >= 0 OR days_to_convert IS NULL"           
+    columns:
+    - name: customerid
+      description: "Unique customer identifier."
+      tests:
+        - not_null
+        - unique
+    - name: country
+      description: "Country of the customer."
+    - name: postal_code
+      description: "Customer postal code from staging table."
+    - name: cohort_month
+      description: "Cohort month of the customer based on first order."
+      tests:
+        - not_null
+    - name: first_purchase
+      description: "Timestamp of the customer's first purchase."
+      tests:
+        - not_null
+        - dbt_expectations.expect_column_values_to_be_of_type:
+            column_type: timestamp # Or datetime, depending on your warehouse
+    - name: last_purchase
+      description: "Timestamp of the customer's most recent purchase."
+      tests:
+        - dbt_expectations.expect_column_values_to_be_of_type:
+            column_type: timestamp # Or datetime, depending on your warehouse
+        # Ensure last purchase is not before first purchase
+        - dbt_utils.expression_is_true:
+            arguments:
+              expression: ">= first_purchase"
+    - name: avg_order_value
+      description: "Average order value per customer from base metrics."
+      tests:
+        - dbt_expectations.expect_column_values_to_be_between:
+            min_value: 0.0
+    - name: days_since_last_purchase
+      description: "Number of days since the customer's last purchase."
+      tests:
+        - dbt_expectations.expect_column_values_to_be_between:
+            min_value: 0
+    - name: revenue_per_day
+      description: "Average revenue per day for the customer."
+      tests:
+        - dbt_expectations.expect_column_values_to_be_between:
+            min_value: 0.0
+    - name: days_to_convert
+      description: "Number of days from first awareness to conversion."
+    - name: is_converted
+      description: "Boolean indicating if the customer converted."
+      tests:
+        - accepted_values:
+            values: [TRUE, FALSE]
+    - name: acquisition_cost
+      description: "Cost to acquire the customer through marketing."
+      tests:
+        - dbt_expectations.expect_column_values_to_be_between:
+            min_value: 0.0
+    - name: total_orders
+      description: "Total number of orders (aggregated)."
+      tests:
+        - not_null
+        - dbt_expectations.expect_column_values_to_be_between:
+            min_value: 0
+    - name: total_spent
+      description: "Total revenue from orders."
+      tests:
+        - dbt_expectations.expect_column_values_to_be_between:
+            min_value: 0.0
 
-    - unique
-    - not_null
-  - name: channel
-    description: "Primary marketing channel for the campaign."
-  - name: objective
-    description: "Campaign objective (e.g., awareness, conversion)."
-  - name: budget
-    description: "Budget allocated for the campaign."
-  - name: start_dt
-    description: "Campaign start date."
-  - name: end_dt
-    description: "Campaign end date."
-  - name: awareness_users
-    description: "Number of users reached at the awareness stage."
-  - name: consideration_users
-    description: "Number of users reached at the consideration stage."
-  - name: conversion_users
-    description: "Number of users reached at the conversion stage."
-  - name: rate_awareness_to_consideration
-    description: "Conversion rate from awareness to consideration stage."
-  - name: rate_consideration_to_conversion
-    description: "Conversion rate from consideration to conversion stage."
-  - name: rate_overall_conversion
-    description: "Overall conversion rate from awareness to conversion stage."
-  - name: total_engagements
-    description: "Total engagement events recorded for the campaign."
-  - name: total_conversions
-    description: "Total conversions from engagements."
-  - name: cvr
-    description: "Conversion rate based on engagement events."
-  - name: cohort_month
-    description: "Month of the customer cohort associated with the campaign."
-  - name: customer_count
-    description: "Number of unique customers in the cohort."
-  - name: cohort_conversions
-    description: "Number of conversions in the cohort."
-  - name: avg_days_to_convert
-    description: "Average number of days from first touch to conversion for the cohort."
-  - name: total_orders
-    description: "Total number of orders generated by the campaign."
-  - name: total_revenue
-    description: "Total revenue generated by the campaign."
-  - name: aov
-    description: "Average order value (total_revenue / total_orders)."
-  - name: total_spend
-    description: "Total spend allocated or used for the campaign."
-  - name: roas
-    description: "Return on ad spend (total_revenue / total_spend)."
-  - name: cac
-    description: "Customer acquisition cost (total_spend / total_conversions)."
-  - name: spend_per_conversion
-    description: "Campaign spend per converted customer (total_spend / cohort_conversions)."
-  - name: revenue_per_conversion
-    description: "Revenue per converted customer (total_revenue / total_conversions)."
-  - name: ltv_to_cac_ratio
-    description: "Ratio of revenue per customer to customer acquisition cost."
-
-models:
-
-- name: mart_customer_360
-  description: "360° view of each customer including demographic, purchase, marketing, funnel, product, revenue, value segmentation, and derived metrics (LTV and average days between orders)."
-  columns:
-
-  - name: customerid
-    description: "Unique customer identifier."
-    tests:
-
-    - not_null
-    - unique
-  - name: country
-    description: "Country of the customer."
-  - name: postal_code
-    description: "Customer postal code from staging table."
-  - name: cohort_month
-    description: "Cohort month of the customer based on first order."
-  - name: first_purchase
-    description: "Timestamp of the customer's first purchase."
-  - name: last_purchase
-    description: "Timestamp of the customer's most recent purchase."
-  - name: avg_order_value
-    description: "Average order value per customer from base metrics."
-  - name: days_since_last_purchase
-    description: "Number of days since the customer's last purchase."
-  - name: revenue_per_day
-    description: "Average revenue per day for the customer."
-  - name: campaign_id
-    description: "Campaign associated with the customer in funnel stage."
-  - name: funnel_channel
-    description: "Channel through which the customer entered the funnel."
-  - name: first_awareness_ts
-    description: "Timestamp when the customer first became aware of a campaign."
-  - name: first_consideration_ts
-    description: "Timestamp when the customer first entered consideration stage."
-  - name: first_conversion_ts
-    description: "Timestamp when the customer first converted."
-  - name: is_converted
-    description: "Boolean indicating if the customer converted."
-  - name: days_to_convert
-    description: "Number of days from first awareness to conversion."
-  - name: first_campaign_id
-    description: "Customer's first campaign ID."
-  - name: channel_first_touch
-    description: "Channel of the customer's first campaign touch."
-  - name: acquisition_cost
-    description: "Cost to acquire the customer through marketing."
-  - name: favorite_product_id
-    description: "Customer's favorite product ID."
-  - name: favorite_product_description
-    description: "Description of the favorite product."
-  - name: total_products_purchased
-    description: "Total number of products purchased by the customer."
-  - name: value_segment
-    description: "Customer segment based on RFM scoring."
-  - name: recency_days
-    description: "Recency in days for RFM calculation."
-  - name: recency_score
-    description: "RFM recency score."
-  - name: frequency_score
-    description: "RFM frequency score."
-  - name: monetary_score
-    description: "RFM monetary score."
-  - name: rfm_total_score
-    description: "Total RFM score."
-  - name: total_orders
-    description: "Total number of orders (aggregated)."
-  - name: total_quantity
-    description: "Total quantity of items purchased."
-  - name: total_spent
-    description: "Total revenue from orders."
-  - name: avg_unit_price
-    description: "Average unit price of items purchased."
-  - name: avg_items_per_order
-    description: "Average number of items per order."
-  - name: lifetime_value
-    description: "Customer lifetime value (total_spent)."
-  - name: avg_days_between_orders
-    description: "Average days between orders for the customer."
-
-
-
-
-
-
-  
+    - name: value_segment
+      description: "Customer segment based on RFM scoring."
+      tests:
+        - not_null        
+    - name: rfm_total_score
+      description: "Total RFM score."
+      tests:
+        # Assumes 1-5 scoring for R, F, and M
+        - dbt_expectations.expect_column_values_to_be_between:
+            min_value: 3
+            max_value: 15
+    - name: lifetime_value
+      description: "Customer lifetime value (total_spent)."
+      tests:
+        - dbt_expectations.expect_column_values_to_be_between:
+            min_value: 0.0
+    - name: avg_days_between_orders
+      description: "Average days between orders for the customer."
+      

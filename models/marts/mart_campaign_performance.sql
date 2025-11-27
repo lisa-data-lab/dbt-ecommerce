@@ -25,7 +25,6 @@ WITH base AS (
         cvr.total_conversions,
         cvr.cvr,
 
-        coh.cohort_month,
         coh.customer_count,
         coh.conversions AS cohort_conversions,
         coh.avg_days_to_convert,

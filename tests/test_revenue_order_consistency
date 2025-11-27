@@ -1,0 +1,8 @@
+SELECT
+    date,
+    Total_Orders,
+    Total_Revenue
+FROM {{ ref('mart_daily_kpis') }}
+-- Fail if Orders > 0 AND Revenue is 0 OR Orders = 0 AND Revenue > 0
+WHERE (Total_Orders > 0 AND Total_Revenue = 0)
+   OR (Total_Orders = 0 AND Total_Revenue > 0)

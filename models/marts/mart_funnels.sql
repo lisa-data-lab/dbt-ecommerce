@@ -1,3 +1,7 @@
+{{ config(
+    materialized='table',
+   ) }}
+
 WITH customer_metrics AS (
     SELECT
         campaign_id,

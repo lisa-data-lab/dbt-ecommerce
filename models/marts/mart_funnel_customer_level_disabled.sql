@@ -3,6 +3,7 @@
     config(
         materialized='table',
         table_name='mart_funnel_customer_level',
+        enabled=False,
         description='Customer-level funnel metrics per campaign.'
     )
 }}

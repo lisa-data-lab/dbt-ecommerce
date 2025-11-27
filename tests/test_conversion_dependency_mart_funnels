@@ -1,0 +1,13 @@
+-- tests/test_conversion_dependency_mart_funnels.sql
+
+SELECT
+    campaign_id,
+    conversion_users,
+    avg_days_to_convert,
+    median_days_to_convert
+FROM {{ ref('mart_funnels') }}
+WHERE 
+    -- We only care about rows where conversions were zero
+    conversion_users = 0 
+    -- AND the days_to_convert is somehow NOT NULL (which is the failure condition)
+    AND avg_days_to_convert IS NOT NULL
