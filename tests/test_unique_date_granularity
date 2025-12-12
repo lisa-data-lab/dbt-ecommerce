@@ -6,5 +6,5 @@ SELECT
 FROM {{ ref('mart_daily_kpis') }}
 
 -- Group by date and find any date that appears more than once
-GROUP BY 1
-HAVING COUNT(*) > 1
+GROUP BY date
+HAVING COUNT(*) > date
