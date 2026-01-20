@@ -86,10 +86,10 @@ An end-to-end analytics pipeline that ingests CSVs from cloud storage, standardi
 5. Use queries in `queries-e-commerce/` for KPI and CLV analysis  
 
 ### Databricks Ingestion & Transformation Pipelines
-- [DLT Expectations](pipeline/DLT%20expectations)  
+- [Ingestion Pipelines](pipeline/ingestion)
 - [Dimension Transformations](pipeline/dim_transformations)  
-- [Fact Transformations](pipeline/fact_transformations)  
-- [Ingestion Pipelines](pipeline/ingestion)  
+- [Fact Transformations](pipeline/fact_transformations)
+- [DLT Expectations](pipeline/DLT%20expectations) 
 
 ### Databricks Queries
 - [KPI Calculations](queries-e-commerce/KPIs_calculations)  
@@ -100,9 +100,9 @@ An end-to-end analytics pipeline that ingests CSVs from cloud storage, standardi
 ### dbt Models
 - [All dbt models](models)  
 - Key subfolders:  
-  - [Staging](models/staging) (10 models)  
-  - [Intermediate](models/intermediate) (5 models)  
-  - [Marts](models/marts) (7 models)  
+  - [Staging](models/staging)   
+  - [Intermediate](models/intermediate)   
+  - [Marts](models/marts)   
 
 ### dbt Tests
 - [All dbt tests](tests)  
