@@ -86,7 +86,7 @@ An end-to-end analytics pipeline that ingests CSVs from cloud storage, standardi
 5. Use queries in `queries-e-commerce/` for KPI and CLV analysis  
 
 ### Databricks Ingestion & Transformation Pipelines
-- [Ingestion Pipelines](pipeline/ingestion)
+- [Ingestion Pipeline](pipeline/my_transformation.py)
 - [Dimension Transformations](pipeline/dim_transformations)  
 - [Fact Transformations](pipeline/fact_transformations)
 - [DLT Expectations](pipeline/DLT%20expectations) 
