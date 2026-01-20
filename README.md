@@ -92,10 +92,10 @@ An end-to-end analytics pipeline that ingests CSVs from cloud storage, standardi
 - [DLT Expectations](pipeline/DLT%20expectations) 
 
 ### Databricks Queries
-- [KPI Calculations](queries-e-commerce/Databricks SQL for KPIs.dbquery.ipynb)  
-- [CLV Proxy](queries-e-commerce/CLV proxy.dbquery.ipynb)  
-- [CAC vs LTV Ratio by Cohort](queries-e-commerce/CAC vs LTV ratio by cohort.dbquery.ipynb)  
-- [Run Log Table](notebooks-e-commerce/run log table.ipynb)
+- [KPI Calculations](queries-ecommerce/Databricks%20SQL%20for%20KPIs.dbquery.ipynb)
+- [CLV Proxy](queries-ecommerce/CLV%20proxy.dbquery.ipynb)
+- [CAC vs LTV Ratio by Cohort](queries-ecommerce/CAC%20vs%20LTV%20ratio%20by%20cohort.dbquery.ipynb)
+- [Run Log Table](notebooks-ecommerce/run%20log%20table.ipynb)
 
 ### dbt Models
 - [All dbt models](models)  
