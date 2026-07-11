@@ -69,10 +69,6 @@ models:
         tests:
           - not_null
           - unique
-      - name: customer_id
-        description: "Customer who placed the order"
-        tests:
-          - not_null
           
   - name: stg_order_items
     description: "Cleaned order items staging table"

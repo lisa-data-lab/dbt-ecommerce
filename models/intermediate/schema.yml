@@ -288,11 +288,17 @@ models:
         tests:
           - not_null
           - unique
+          - relationships:
+              field: customer_id
+              to: ref('stg_customers')
 
       - name: favorite_product_id
         description: Product ID of the customer's most purchased product.
         tests:
           - not_null
+          - relationships:
+              field: stockcode
+              to: ref('stg_products_dim')
 
       - name: favorite_product_description
         description: Description of the customer's most purchased product.
