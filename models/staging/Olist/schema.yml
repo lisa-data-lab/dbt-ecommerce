@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: olist
+    database: bronze_dev # Adjust if you are using a different Databricks catalog
+    schema: olist
+    tables:
+      - name: customers
+      - name: geolocations
+      - name: order_items
+      - name: order_payments
+      - name: order_reviews
+      - name: orders
+      - name: products
+      - name: sellers
+
+models:
+  - name: stg_customers
+    description: "Cleaned and standardized Olist customer profile records."
