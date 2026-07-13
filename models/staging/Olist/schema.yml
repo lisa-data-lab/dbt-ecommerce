@@ -73,3 +73,40 @@ models:
         description: "The number of installments chosen for the payment."
       - name: payment_value
         description: "The total monetary value processed by this payment method."
+
+  - name: stg_order_reviews_olist
+    description: "Staging table for customer review feedback, scores, and response timestamps."
+    columns:
+      - name: review_id
+        description: "The unique identifier of the review."
+        tests:
+          - not_null
+      - name: order_id
+        description: "The unique identifier of the order being reviewed."
+        tests:
+          - not_null
+      - name: review_score
+        description: "The satisfaction score ranging from 1 to 5."
+        tests:
+          - not_null
+      - name: created_at
+        description: "The timestamp when the review survey was sent to the customer."
+      - name: answered_at
+        description: "The timestamp when the customer submitted their response."
+
+  - name: stg_orders_olist
+    description: "Staging table for core order records, capturing fulfillment status and key operational timestamps."
+    columns:
+      - name: order_id
+        description: "The unique identifier of the order."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "The unique identifier linking the order to a specific customer record."
+        tests:
+          - not_null
+      - name: order_status
+        description: "The current lifecycle status of the order (e.g., delivered, shipped, canceled)."
+        tests:
+          - not_null
