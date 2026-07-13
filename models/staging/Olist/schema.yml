@@ -15,5 +15,5 @@ sources:
       - name: sellers
 
 models:
-  - name: stg_customers
+  - name: stg_customers_olist
     description: "Cleaned and standardized Olist customer profile records."
