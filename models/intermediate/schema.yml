@@ -23,7 +23,6 @@ models:
       - name: revenue_per_day
         description: "Average daily revenue per customer"
 
-models:
   - name: int_user_activity
     description: "Aggregated daily, weekly, and monthly active users"
     columns:
@@ -38,7 +37,6 @@ models:
       - name: mau
         description: "Monthly Active Users"
 
-models:
   - name: int_campaign_cvr
     description: "Intermediate model calculating conversion rate (CVR) by campaign."
     columns:
@@ -51,7 +49,6 @@ models:
       - name: cvr
         description: "Conversion rate = total_conversions / total_engagements."
 
-models:
   - name: int_aov_overall
     description: "Intermediate table calculating Average Order Value (AOV) by currency"
     columns:
@@ -72,7 +69,6 @@ models:
         tests:
           - not_null
 
-models:
   - name: int_aov_by_campaign
     description: "Average Order Value (AOV) per campaign, calculated from customer orders linked to campaigns via journey events."
     columns:
@@ -88,7 +84,6 @@ models:
       - name: aov
         description: "Average Order Value for the campaign (total_revenue / total_orders)"
 
-models:
   - name: int_campaign_roas
     description: "ROAS per campaign using revenue from orders and marketing spend"
     columns:
@@ -104,7 +99,6 @@ models:
       - name: roas
         description: "Return on Ad Spend (Revenue / Spend)"
 
-models:
   - name: int_funnel_events
     description: "Unified funnel event log across awareness, consideration, and conversion stages."
     columns:
@@ -120,7 +114,6 @@ models:
       - name: stage_ts
         description: "Timestamp of the funnel event."
 
-models:
   - name: int_funnel_events_by_campaign
     description: |
       Intermediate table that aggregates funnel engagement and conversion
@@ -146,7 +139,6 @@ models:
         tests:
           - not_null
 
-models:
   - name: int_funnel_events_by_channel
     description: |
       Intermediate table that aggregates funnel events and conversions 
@@ -184,7 +176,6 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: ['channel', 'funnel_stage']
 
-models:
   - name: int_funnel_conversion_by_channel
     description: "Pivoted funnel metrics per marketing channel with conversion rates."
     columns:
@@ -205,7 +196,6 @@ models:
       - name: rate_overall_conversion
         description: "Overall conversion rate from awareness to conversion."
 
-models:
   - name: int_funnel_conversion_by_campaign
     description: "Pivoted funnel metrics per campaign with conversion rates."
     columns:
@@ -239,7 +229,6 @@ models:
       - name: rate_overall_conversion
         description: "Conversion rate from awareness to conversion."
 
-models:
   - name: int_customer_cohort_monthly
     description: |
       Monthly customer cohort table. Defines each customer’s first purchase
@@ -261,7 +250,6 @@ models:
         tests:
           - not_null
 
-models:
   - name: int_customer_revenue_monthly
     description: |
       Customer revenue table aggregated by customer.
@@ -289,7 +277,6 @@ models:
         tests:
           - not_null
 
-models:
   - name: int_customer_product
     description: |
       Customer-level product table.
@@ -317,7 +304,6 @@ models:
         tests:
           - not_null
 
-models:
   - name: int_customer_marketing
     description: |
       Customer-level marketing table.
@@ -344,7 +330,6 @@ models:
       - name: first_event_date
         description: Timestamp
 
-models:
   - name: int_customer_funnel
     description: "Customer-level funnel summary with first timestamps for each stage, conversion flag, and days_to_convert"
     columns:
@@ -370,7 +355,6 @@ models:
       - name: days_to_convert
         description: "Number of days between first awareness and conversion stage (null if not converted)"
 
-models:
   - name: int_customer_value_segments
     description: "Customer-level value segmentation using int_customer_base_metrics with RFM scoring and value labels"
     columns:
@@ -400,7 +384,6 @@ models:
       - name: value_segment
         description: "Customer value segment label: High Value, Medium Value, Low Value"
 
-models:
   - name: int_cohort_metrics
     description: "Cohort-level metrics including customer counts, conversion rate, and revenue aggregated by acquisition month"
     columns:
@@ -421,11 +404,8 @@ models:
       - name: avg_revenue_per_customer
         description: "Average revenue per customer in the cohort (total_revenue / customers_in_cohort)"
 
-models:
-
-- name: int_campaign_cohorts
-  description: "Aggregated cohort-level metrics by campaign based on first_conversion_ts from int_customer_funnel."
-  columns:
+  - name: int_campaign_cohorts
+    description: "Aggregated cohort-level metrics by campaign based on first_conversion_ts from int_customer_funnel."
 
   - name: campaign_id
     description: "Unique identifier for the marketing campaign that acquired the customer."
@@ -448,8 +428,6 @@ models:
     description: "Average number of days it took customers in this cohort to convert, from first awareness to conversion."
     tests:
       - not_null
-
-models:
 
   - name: int_daily_conversions
     description: "Daily-level metrics including total orders, total revenue, and total customer conversions."
@@ -475,8 +453,6 @@ models:
         description: "Total revenue from all orders on this date (sum of total_amount)."
         tests:
           - not_null
-
-models:
 
   - name: int_daily_marketing_metrics
     description: "Daily aggregated marketing metrics including total spend and total impressions."

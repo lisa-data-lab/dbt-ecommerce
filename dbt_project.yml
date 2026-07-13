@@ -40,9 +40,23 @@ models:
     staging:
       +schema: ecommerce_staging    # staging tables live here
       +materialized: view
+
+    Olist:
+      +schema: olist_staging
+      +materialized: view
+
     intermediate:
       +schema: ecommerce_int        # intermediate tables live here
       +materialized: view
+
+    Olist:
+      +schema: olist_intermediate
+      +materialized: view
+
     marts:
       +schema: ecommerce_mart       # mart tables live here
+      +materialized: table
+
+    Olist:
+      +schema: olist_marts
       +materialized: table

@@ -6,7 +6,7 @@ sources:
     schema: olist
     tables:
       - name: customers
-      - name: geolocations
+      - name: geolocation
       - name: order_items
       - name: order_payments
       - name: order_reviews
@@ -17,3 +17,59 @@ sources:
 models:
   - name: stg_customers_olist
     description: "Cleaned and standardized Olist customer profile records."
+
+  - name: stg_geolocations_olist
+    description: "Staging table for Olist geolocation data mapping zip code prefixes to spatial coordinates."
+    columns:
+      - name: zip_code_prefix
+        description: "The first 5 digits of the zip code."
+        tests:
+          - not_null
+      - name: latitude
+        description: "Latitude coordinate."
+        tests:
+          - not_null
+      - name: longitude
+        description: "Longitude coordinate."
+        tests:
+          - not_null 
+
+  - name: stg_order_items_olist
+    description: "Staging table for order line item details, including pricing, freight, and fulfillment deadlines."
+    columns:
+      - name: order_id
+        description: "The unique identifier of the order."
+        tests:
+          - not_null
+      - name: line_item_number
+        description: "The sequential number identifying the item within the order (e.g., 1, 2, 3)."
+        tests:
+          - not_null
+      - name: product_id
+        description: "The unique identifier of the product."
+        tests:
+          - not_null
+      - name: seller_id
+        description: "The unique identifier of the seller."
+        tests:
+          - not_null
+
+  - name: stg_order_payments_olist
+    description: "Staging table for order payment methods, installment splits, and total payment amounts."
+    columns:
+      - name: order_id
+        description: "The unique identifier of the order."
+        tests:
+          - not_null
+      - name: payment_sequence_number
+        description: "The sequential order of payment methods if multiple methods were used."
+        tests:
+          - not_null
+      - name: payment_type
+        description: "The method of payment (e.g., credit_card, boleto, voucher, debit_card)."
+        tests:
+          - not_null
+      - name: payment_installments
+        description: "The number of installments chosen for the payment."
+      - name: payment_value
+        description: "The total monetary value processed by this payment method."
