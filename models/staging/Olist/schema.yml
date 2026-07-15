@@ -110,3 +110,27 @@ models:
         description: "The current lifecycle status of the order (e.g., delivered, shipped, canceled)."
         tests:
           - not_null
+
+  - name: stg_products_olist
+    description: "Staging table for product catalog metadata, including original category names and item dimensions."
+    columns:
+      - name: product_id
+        description: "The unique identifier of the product."
+        tests:
+          - not_null
+          - unique
+      - name: product_category_name
+        description: "The category name listed in its original language (Portuguese)."
+
+  - name: stg_sellers_olist
+    description: "Staging table for merchant information, capturing their unique ID and operational location."
+    columns:
+      - name: seller_id
+        description: "The unique identifier of the seller."
+        tests:
+          - not_null
+          - unique
+      - name: zip_code_prefix
+        description: "The first 5 digits of the seller's zip code."
+        tests:
+          - not_null
