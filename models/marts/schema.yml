@@ -358,6 +358,32 @@ models:
   - name: avg_days_between_orders
     description: "Average days between orders for the customer."
 
+  - name: fact_orders_olist
+    description: "Core fact table containing consolidated logistics, metrics, and financial reconciliations for Olist orders at the order_id grain."
+    columns:
+      - name: order_id
+        description: "The unique identifier of the order."
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Foreign key pointing to the customer who placed the order."
+        tests:
+          - not_null
+
+  - name: dim_customers_olist
+    description: "Dimension table containing customer details, mapping the transaction-level customer_id to the unique physical customer_unique_id along with demographic details."
+    columns:
+      - name: customer_id
+        description: "The unique identifier of the customer record for a specific order (Primary Key)."
+        tests:
+          - unique
+          - not_null
+      - name: customer_unique_id
+        description: "The unique identifier of the physical customer (recurrent across multiple orders)."
+        tests:
+          - not_null        
+
 
 
 

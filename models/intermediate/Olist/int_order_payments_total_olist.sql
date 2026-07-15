@@ -7,7 +7,7 @@ rolled_up_payments as (
         order_id,
         -- Aggregated transaction values
         sum(payment_value) as total_payment_value,
-        max(payment_sequential) as total_payment_sequences,
+        max(payment_sequence_number) as total_payment_sequences,
         max(payment_installments) as max_payment_installments,
 
         -- Payment method indicator flags (useful for payment dashboard breakdown)
