@@ -475,8 +475,6 @@ models:
           - expression_is_true:
               expression: "total_impressions >= 0"
 
-models:
-
   - name: int_daily_kpis
     description: "Daily-level KPIs combining user activity, customer conversions, and marketing metrics."
     columns:
