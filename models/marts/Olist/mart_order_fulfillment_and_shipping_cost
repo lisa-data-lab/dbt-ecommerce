@@ -1,0 +1,50 @@
+{{ config(
+    materialized='table',
+    file_format='delta',
+    liquid_clustering='customer_state'
+) }}
+
+with orders as (
+    select * from {{ ref('fact_orders_olist') }}
+),
+
+customers as (
+    select * from {{ ref('dim_customers_olist') }}
+),
+
+sellers as (
+    select * from {{ ref('dim_sellers_olist') }}
+),
+
+final as (
+    select
+        o.order_id,
+        o.customer_id,
+        c.customer_state,
+        s.seller_state,
+        o.order_status,
+        o.order_purchase_timestamp,
+        o.order_approved_at,
+        o.order_delivered_carrier_date,
+        o.order_delivered_customer_date,
+        o.order_estimated_delivery_date,
+        
+        -- Delivery Metrics
+        datediff(o.order_delivered_customer_date, o.order_purchase_timestamp) as actual_delivery_lead_time_days,
+        datediff(o.order_estimated_delivery_date, o.order_purchase_timestamp) as estimated_delivery_lead_time_days,
+        
+        -- SLA Breaches
+        case 
+            when o.order_delivered_customer_date > o.order_estimated_delivery_date then 1 
+            else 0 
+        end as is_delivered_late,
+        
+        datediff(o.order_delivered_customer_date, o.order_estimated_delivery_date) as days_late
+
+    from orders o
+    left join customers c on o.customer_id = c.customer_id
+    -- Note: mapping to sellers usually requires bridging via order items if orders contain items from multiple sellers
+    left join sellers s on o.seller_id = s.seller_id 
+)
+
+select * from final
