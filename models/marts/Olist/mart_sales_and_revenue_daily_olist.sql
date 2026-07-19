@@ -5,15 +5,13 @@
 ) }}
 
 with orders as (
-    -- Pull the prices and freight values directly from here since they already exist!
     select 
         order_id,
         customer_id,
         order_status,
-        cast(order_purchase_timestamp as date) as order_date,
-        total_item_price,      -- Using your existing column
-        total_freight_value,   -- Using your existing column
-        product_id             -- If product_id lives directly on your order fact
+        cast(purchased_at as date) as order_date,
+        total_item_price,
+        total_freight_value
     from {{ ref('fact_orders_olist') }}
 ),
 
@@ -24,33 +22,26 @@ order_payments as (
     from {{ ref('int_order_payments_total_olist') }}
 ),
 
-products as (
-    select * from {{ ref('dim_products_olist') }}
-),
-
 joined as (
     select
         o.order_date,
-        p.product_category_name,
         o.order_id,
         o.customer_id,
-        o.total_item_price,      -- No CTE sum needed
-        o.total_freight_value,   -- No CTE sum needed
+        o.total_item_price,
+        o.total_freight_value,
         op.total_payment_value
     from orders o
     left join order_payments op on o.order_id = op.order_id
-    left join products p on p.product_id = o.product_id 
     where o.order_status = 'delivered'
 )
 
 select
     order_date,
-    coalesce(product_category_name, 'Unknown') as product_category_name,
     sum(total_payment_value) as total_revenue,
     sum(total_item_price) as total_sales_value,
     sum(total_freight_value) as total_freight_value,
     count(distinct order_id) as total_orders,
     count(distinct customer_id) as unique_customers,
-    round(sum(total_payment_value) / count(distinct order_id), 2) as average_order_value
+    round(sum(total_payment_value) / nullif(count(distinct order_id), 0), 2) as average_order_value
 from joined
-group by 1, 2
+group by 1
